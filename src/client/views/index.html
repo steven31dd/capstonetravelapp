@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Explore The World</title>
+        <link href="https://fonts.googleapis.com/css2?family=Courgette&family=Markazi+Text&display=swap" rel="stylesheet">
+    </head>
+
+    <body>
+
+        <header>
+            <div class="">
+                Logo
+            </div>
+            <div class="">
+                navigation
+            </div>
+        </header>
+
+        <main>
+            <section onsubmit="return Client.handleSubmit(event)">
+              <h3>Create A Plan</h3>
+              <form id="plan-create" class="form-plan">
+                <label for="location">Where would you like to go?:</label>
+                <input id="destination" name="location" type="text" required>
+
+                <label for="departure">Date to depart:</label>
+                <input id="date-Departure" name="departure" type="date" required>
+
+                <label for="return">Date to return:</label>
+                <input id="date-Return" name="return" type="date" required>
+
+                <input type="submit" name="" value="submit" onclick="return Client.handleSubmit(event)" onsubmit="return Client.handleSubmit(event)">
+              </form>
+            </section>
+
+            <section id="result-data">
+            </section>
+        </main>
+
+        <footer>
+            <p></p>
+        </footer>
+
+    </body>
+</html>

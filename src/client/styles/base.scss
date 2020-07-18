@@ -1,0 +1,48 @@
+$Jet: #363635;
+$ForestGreenCrayola: #6cae75;
+$BlueBell: #8d91c7;
+$DeepChampagne: #fbd1a2;
+$Bittersweet: #ff6b6b;
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: $BlueBell;
+    color: $Jet;
+    font-family: Markazi, sans-serif;
+}
+
+main {
+    flex: 2;
+}
+
+header{
+  background-color: $ForestGreenCrayola;
+}
+
+section {
+    max-width: 800px;
+    margin: 50px auto;
+    align-content: center;
+    justify-content: center;
+}
+
+form{
+  background-color: $Bittersweet;
+}
+
+.btn{
+  background-color: $DeepChampagne;
+  display: block;
+  font-size: 14px;
+  padding: 15px 50px;
+  margin: 30px 0;
+  border: none;
+  border-radius: 1rem;
+  color: $Jet;
+}
+
+.btn:hover{
+  background-color: $ForestGreenCrayola;
+}
