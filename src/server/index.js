@@ -59,6 +59,7 @@ app.get('/getGeographics', (req, res) => {
           console.log(response.postalCodes[0]);
           planData.Long = response.postalCodes[0].lng;
           planData.Lat = response.postalCodes[0].lat;
+
           res.send(true);
     })
     .catch(error => {
@@ -75,6 +76,8 @@ app.get('/getWeather', (req, res) => {
         .then(response =>{
           planData.temperature = response[1].temp;
           planData.description = response[0].weather.description;
+
+          console.log(response);
 
           res.send({temp : planData.temperature, weather: planData.description});
     })

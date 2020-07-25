@@ -20,9 +20,19 @@ function handleSubmit(event) {
     UpdateDate(startDate, endDate, daysInTravel, location);
 
     getGeo(`http://localhost:8080/getGeographics`)
-      .then(getWeather(`http://localhost:8080/getWeather`))
+      .then(async (data) =>{
+        getWeather(`http://localhost:8080/getWeather`)
+          .then(async (weatherData) =>{
+            console.log(weatherData.weather);
+            UpdateWeatherResult(weatherData);
 
-    getImage(`http://localhost:8080/getImage`);
+          })
+        })
+
+    getImage(`http://localhost:8080/getImage`)
+      .then(async (imgData) => {
+        UpdateImageResult(imgData);
+      })
 
 }
 
@@ -36,8 +46,6 @@ async function postTrip(url, tripData){
     },
     body: JSON.stringify(tripData)
   });
-
-  return response.json();
 }
 
 const getGeo = async(url) => {
@@ -84,8 +92,8 @@ const getWeather = async (url) => {
     });
     try{
       const data = await res.json();
-
-      UpdateWeatherResult(data);
+      console.log(`weather response: ${data}`)
+      return data;
 
     }catch{
       ResultError(`WEATHER: ${res.statusText}`);
@@ -103,7 +111,7 @@ const getImage = async (url) =>{
     try{
       const data = await res.json();
 
-      UpdateImageResult(data);
+      return data;
     }catch{
       ResultError(`IMAGE: ${res.statusText}`);
     }
@@ -125,9 +133,10 @@ function UpdateWeatherResult(weatherData){
   let result_Weather = document.createElement('p');
 
   const weatherHTML = `Temperature: ${weatherData.temp} <br/> Description: ${weatherData.weather}`;
+
   result_Weather.innerHTML = weatherHTML;
 
-  resultFragment.lastChild.append(result_Weather);
+  resultFragment.append(result_Weather);
 
   resultID.append(resultFragment);
 }
@@ -157,7 +166,7 @@ function UpdateImageResult(imageData){
   result_Image.src = imageData.source;
   result_Image.alt = imageData.location;
 
-  resultFragment.lastChild.append(result_Image);
+  resultFragment.append(result_Image);
 
 
   resultID.append(resultFragment);
