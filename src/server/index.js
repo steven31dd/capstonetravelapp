@@ -46,7 +46,6 @@ app.post('/createTrip', (req, res) => {
   planData = newEntry;
 
   console.log(planData);
-  console.log(`Test Variable: ${planData.location} or ${planData[location]}`)
 })
 
 app.get('/getGeographics', (req, res) => {
@@ -58,8 +57,8 @@ app.get('/getGeographics', (req, res) => {
         .then(response =>{
           console.log('Data From GeoNames[0]')
           console.log(response.postalCodes[0]);
-          planData[Long] = response.postalCodes[0].lng;
-          planData[Lat] = response.postalCodes[0].lat;
+          planData.Long = response.postalCodes[0].lng;
+          planData.Lat = response.postalCodes[0].lat;
           res.send(true);
     })
     .catch(error => {
@@ -74,8 +73,8 @@ app.get('/getWeather', (req, res) => {
     fetch(url)
       .then(response => response.json())
         .then(response =>{
-          planData[temperature] = response[1].temp;
-          planData[description] = response[0].weather.description;
+          planData.temperature = response[1].temp;
+          planData.description = response[0].weather.description;
 
           res.send({temp : planData.temperature, weather: planData.description});
     })
@@ -90,7 +89,8 @@ app.get('/getImage', (req, res) => {
   console.log(url);
     fetch(url).then(response =>{
       const result = response.data.hits[0].webformatURL;
-      planData[imgSource] = result;
+      console.log(`Image result: ${result}`)
+      planData.imgSource = result;
       res.send({ source: planData.imgSource, alternate: planData.location});
     })
     .catch(error => {

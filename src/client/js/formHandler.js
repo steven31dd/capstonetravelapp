@@ -15,7 +15,7 @@ function handleSubmit(event) {
     const TravelTime = endDate.getTime() - startDate.getTime();
     const daysInTravel = `${TravelTime / (1000 * 60 * 60 *24)} days`;
 
-    postTrip('/createTrip', { Location: location, Start : startDate, End: endDate, Duration: daysInTravel })
+    postTrip('http://localhost:8080/createTrip', { Location: location, Start : startDate, End: endDate, Duration: daysInTravel })
 
     UpdateDate(startDate, endDate, daysInTravel, location);
 
@@ -26,7 +26,7 @@ function handleSubmit(event) {
 
 }
 
-async function postTrip(url ='', tripData ={}){
+async function postTrip(url, tripData){
   const response = await fetch(url, {
     method: 'POST',
     mode: 'cors',
