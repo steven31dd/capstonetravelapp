@@ -7,6 +7,8 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const app = express()
 
+let planData = {};
+
 
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
@@ -32,20 +34,50 @@ app.listen(8080, function () {
     console.log('Server listening on port 8080!')
 })
 
+app.post('/createTrip', (req, res) => {
+  let newData = req.body;
+  let newEntry = {
+    location: newData.Location,
+    startDate: newData.Start,
+    endDate: newData.End,
+    duration: newData.Duration
+  }
+
+  planData = newEntry;
+
+  console.log(planData);
+  console.log(`Test Variable: ${planData.location} or ${planData[location]}`)
+})
+
 app.get('/getGeographics', (req, res) => {
-  const url = `http://api.geonames.org/postalCodeSearchJSON?placename=${req.query.city}&username=${process.env.Geo_User}`;
-    fetch(url).then(response => {
-      res.send(JSON.stringify(response.data.geonames[0]));
+  console.log('GET georaphics')
+  const url = `http://api.geonames.org/postalCodeSearchJSON?placename=${planData.location}&maxRows=10&username=${process.env.Geo_User}`;
+  console.log(url);
+    fetch(url)
+      .then(res => res.json())
+        .then(response =>{
+          console.log('Data From GeoNames[0]')
+          console.log(response.postalCodes[0]);
+          planData[Long] = response.postalCodes[0].lng;
+          planData[Lat] = response.postalCodes[0].lat;
+          res.send(true);
     })
     .catch(error => {
-      res.send(JSON.stringify({error: "An error occured"}));
+      res.send(JSON.stringify({error: error}));
     })
 })
 
 app.get('/getWeather', (req, res) => {
-  const url = `https://api.weatherbit.io/v2.0/current?lat=${req.query.lat}&long=${req.query.long}&key=${process.env.WBit_Key}`;
-    fetch(url).then(response =>{
-      res.send(JSON.stringify(response.data))
+  console.log('GET weather');
+  const url = `https://api.weatherbit.io/v2.0/current?lat=${planData.Lat}&lon=${planData.Long}&key=${process.env.WBit_Key}`;
+  console.log(url);
+    fetch(url)
+      .then(response => response.json())
+        .then(response =>{
+          planData[temperature] = response[1].temp;
+          planData[description] = response[0].weather.description;
+
+          res.send({temp : planData.temperature, weather: planData.description});
     })
     .catch(error => {
       res.send(JSON.stringify({error: "An error occured"}));
@@ -53,11 +85,19 @@ app.get('/getWeather', (req, res) => {
 })
 
 app.get('/getImage', (req, res) => {
-  const url = `https://pixabay.com/api/?key=${process.env.pBay_Key}&q=${req.query.img}&image_type=photo`;
-    fetch.get(url).then(response =>{
-      res.send(JSON.stringify(response.data.hits[0]));
+  console.log('GET Image')
+  const url = `https://pixabay.com/api/?key=${process.env.pBay_Key}&q=${planData.location}&image_type=photo`;
+  console.log(url);
+    fetch(url).then(response =>{
+      const result = response.data.hits[0].webformatURL;
+      planData[imgSource] = result;
+      res.send({ source: planData.imgSource, alternate: planData.location});
     })
     .catch(error => {
       res.send(JSON.stringify({error: "An error has occured"}));
     })
+})
+
+app.get('/getPlan', (req, res) => {
+    res.send(planData);
 })

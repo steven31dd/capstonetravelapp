@@ -12,95 +12,153 @@ function handleSubmit(event) {
     const startDate = new Date(start);
     const endDate = new Date(end);
 
-    Data.city = location;
-    Data.DateStart = startDate;
-    Data.DateEnd = endDate;
-
     const TravelTime = endDate.getTime() - startDate.getTime();
-    Data.DaysToTravel = `${TravelTime / (1000 * 60 * 60 *24)} days`;
+    const daysInTravel = `${TravelTime / (1000 * 60 * 60 *24)} days`;
 
-    getGeo(`http://localhost8080/getGeographics?city=${Data.city}`)
-      .then(UpdateResult());
+    postTrip('/createTrip', { Location: location, Start : startDate, End: endDate, Duration: daysInTravel })
+
+    UpdateDate(startDate, endDate, daysInTravel, location);
+
+    getGeo(`http://localhost:8080/getGeographics`)
+      .then(getWeather(`http://localhost:8080/getWeather`))
+
+    getImage(`http://localhost:8080/getImage`);
 
 }
 
+async function postTrip(url ='', tripData ={}){
+  const response = await fetch(url, {
+    method: 'POST',
+    mode: 'cors',
+    credentials: 'same-origin',
+    headers:{
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(tripData)
+  });
+
+  return response.json();
+}
+
 const getGeo = async(url) => {
-  await fetch(url, {
+  const res = await fetch(url, {
       method: 'GET',
       mode: 'cors',
       headers: {
           'Content-Type': 'application/json;charset=utf-8'
       }
-    })
-      .then(res => res.json())
-        .then(async res => {
-          Data.temperature = res.data[0].temp;
-          Data.weatherDesc = res.data[0].weather.description;
-          Data.population = res.population;
-          await getWeather(`http://localhost:8080/getWeather?lat=${res.lat}&long=${res.long}`)
-  }).catch(error =>{
-      console.log(error)
-  })
+    });
+      try{
+        const data = await res.json();
+        return;
+
+      }catch{
+        ResultError(`GEO: ${res.statusText}`);
+      }
+}
+
+const getTripData = async(url) => {
+  const res = await fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+      }
+    });
+      try{
+        const data = await res.json();
+        return data;
+
+      }catch{
+        ResultError(`UpdateData: ${res.statusText}`);
+      }
 }
 
 const getWeather = async (url) => {
-    await fetch(url ,{
+    const res = await fetch(url ,{
         method: 'GET',
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json:charset=utf-8'
         }
-    })
-    .then(res => res.json())
-    .then(async res =>{
-        Data.weatherTemp = res.data[0].temp;
-        Data.weatherDesc = res.data[0].weather.description;
-        await getImage(`http://localhost:8080/getImage?img=${Data.city}`)
-    })
-    .catch(error =>{
-        console.log(error)
-    })
+    });
+    try{
+      const data = await res.json();
+
+      UpdateWeatherResult(data);
+
+    }catch{
+      ResultError(`WEATHER: ${res.statusText}`);
+    }
 }
 
 const getImage = async (url) =>{
-    await fetch(url , {
+  const res = await fetch(url , {
         method: 'GET',
         mode: 'cors',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
         }
-    })
-    .then(res => res.json())
-    .then(res => {
-        Data.img = res.webformatURL;
-    })
-    .catch(error => {
-        console.log(error)
-    })
+    });
+    try{
+      const data = await res.json();
+
+      UpdateImageResult(data);
+    }catch{
+      ResultError(`IMAGE: ${res.statusText}`);
+    }
 }
 
-function UpdateResult(){
+function ResultError(msg){
+  if(msg !== 'OK')
+  {
+    const el_error = document.createElement('p');
+
+    el_error.innerHTML = msg;
+    resultID.append(el_error);
+  }
+}
+
+function UpdateWeatherResult(weatherData){
+  let resultFragment = document.createDocumentFragment();
+
+  let result_Weather = document.createElement('p');
+
+  const weatherHTML = `Temperature: ${weatherData.temp} <br/> Description: ${weatherData.weather}`;
+  result_Weather.innerHTML = weatherHTML;
+
+  resultFragment.lastChild.append(result_Weather);
+
+  resultID.append(resultFragment);
+}
+
+function UpdateDate(begin, end, duration, location){
   let resultFragment = document.createDocumentFragment();
 
   let result_Header = document.createElement('h3');
-  let result_Image = document.createElement('img');
   let result_Date = document.createElement('p');
-  let result_Weather = document.createElement('p');
 
-  result_Header.innerHTML = Data.city;
+  result_Header.innerHTML = location;
 
-  result_Image.src = Data.img;
-
-  const dateHTML = `Start: ${Data.DateStart} <br/> End: ${Data.DateEnd} <br/> Travel time: ${Data.DaysToTravel}`;
+  const dateHTML = `Start: ${begin} <br/> End: ${end} <br/> Travel time: ${duration}`;
   result_Date.innerHTML = dateHTML;
 
-  const weatherHTML = `Temperature: ${Data.weatherTemp} <br/> Description: ${Data.weatherDesc}`;
-  result_Weather.innerHTML = weatherHTML;
-
   resultFragment.append(result_Header);
-  resultFragment.lastChild.append(result_Image);
   resultFragment.lastChild.append(result_Date);
-  resultFragment.lastChild.append(result_Weather);
+
+  resultID.append(resultFragment);
+}
+
+function UpdateImageResult(imageData){
+  let resultFragment = document.createDocumentFragment();
+
+  let result_Image = document.createElement('img');
+
+  result_Image.src = imageData.source;
+  result_Image.alt = imageData.location;
+
+  resultFragment.lastChild.append(result_Image);
+
 
   resultID.append(resultFragment);
 
