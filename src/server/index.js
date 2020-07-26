@@ -46,6 +46,7 @@ app.post('/createTrip', (req, res) => {
   planData = newEntry;
 
   console.log(planData);
+  res.send('ok');
 })
 
 app.get('/getGeographics', (req, res) => {
@@ -69,17 +70,19 @@ app.get('/getGeographics', (req, res) => {
 
 app.get('/getWeather', (req, res) => {
   console.log('GET weather');
-  const url = `https://api.weatherbit.io/v2.0/current?lat=${planData.Lat}&lon=${planData.Long}&key=${process.env.WBit_Key}`;
+  const url = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${planData.Lat}&lon=${planData.Long}&key=${process.env.WBit_Key}`;
   console.log(url);
     fetch(url)
       .then(response => response.json())
         .then(response =>{
-          planData.temperature = response[1].temp;
-          planData.description = response[0].weather.description;
+          const data = response.data[planData.duration]
+          console.log(data)
 
-          console.log(response);
+          planData.MaxTemp = data.max_temp;
+          planData.MinTemp = data.min_temp;
+          planData.WeatherDesc = data.weather.description
 
-          res.send({temp : planData.temperature, weather: planData.description});
+          res.send({MAX_temperature : planData.MaxTemp, MIN_temperature : planData.MinTemp, weather : planData.WeatherDesc});
     })
     .catch(error => {
       res.send(JSON.stringify({error: "An error occured"}));
@@ -90,11 +93,15 @@ app.get('/getImage', (req, res) => {
   console.log('GET Image')
   const url = `https://pixabay.com/api/?key=${process.env.pBay_Key}&q=${planData.location}&image_type=photo`;
   console.log(url);
-    fetch(url).then(response =>{
-      const result = response.data.hits[0].webformatURL;
-      console.log(`Image result: ${result}`)
-      planData.imgSource = result;
-      res.send({ source: planData.imgSource, alternate: planData.location});
+    fetch(url)
+      .then(response => response.json())
+        .then(response =>{
+
+          const result = response.hits[0].webformatURL;
+          console.log(`Image result: ${result}`)
+          planData.imgSource = result;
+          res.send({source : result});
+
     })
     .catch(error => {
       res.send(JSON.stringify({error: "An error has occured"}));

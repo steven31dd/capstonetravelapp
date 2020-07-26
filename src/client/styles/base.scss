@@ -46,3 +46,41 @@ form{
 .btn:hover{
   background-color: $ForestGreenCrayola;
 }
+
+#result-data{
+  background-color: $ForestGreenCrayola;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.result-header{
+  font-family: Courgette, serif;
+  text-decoration: underline;
+
+}
+
+.result-date{
+  background-color: $DeepChampagne;
+}
+
+.result-weather{
+  background-color: $BlueBell;
+  border-top: 1px solid $Bittersweet;
+  border-bottom: 1px solid $Bittersweet;
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+.result-image{
+  max-width: 512px;
+  max-height: 512px;
+  border-radius: 15px;
+}
+
+.result-error{
+  background-color: $DeepChampagne;
+  border: 2px solid $Bittersweet;
+  font-size: 24px;
+  border-radius: 1.5rem;
+}
